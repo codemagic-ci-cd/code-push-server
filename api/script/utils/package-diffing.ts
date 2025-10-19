@@ -167,10 +167,6 @@ export class PackageDiffer {
                   })
                   .on("end", (): void => {
                     readStreamCounter--;
-                    if (readStreamCounter === 0 && !readStreamError) {
-                      // All read streams have completed successfully
-                      diffFile.end();
-                    }
                   });
 
                 diffFile.addReadStream(readStream, entry.fileName);
