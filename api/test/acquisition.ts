@@ -1269,7 +1269,6 @@ describe("Acquisition Rest API", () => {
               });
           });
         }
-
         sendReport(
           JSON.stringify({
             deploymentKey: deployment.key,
