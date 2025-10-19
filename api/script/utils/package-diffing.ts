@@ -47,7 +47,6 @@ export class PackageDiffer {
     newPackage: storageTypes.Package
   ): Promise<storageTypes.PackageHashToBlobInfoMap> {
     if (!newPackage || !newPackage.blobUrl || !newPackage.manifestBlobUrl) {
-      console.log(`Package information missing`);
       return Promise.reject<storageTypes.PackageHashToBlobInfoMap>(
         diffErrorUtils.diffError(diffErrorUtils.ErrorCode.InvalidArguments, "Package information missing")
       );
