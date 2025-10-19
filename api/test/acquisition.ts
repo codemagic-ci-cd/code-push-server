@@ -12,7 +12,6 @@ import * as redis from "../script/redis-manager";
 import * as utils from "./utils";
 
 import { AzureStorage } from "../script/storage/azure-storage";
-import { JsonStorage } from "../script/storage/json-storage";
 import { UpdateCheckRequest } from "../script/types/rest-definitions";
 import { SDK_VERSION_HEADER } from "../script/utils/rest-headers";
 
@@ -30,14 +29,12 @@ describe("Acquisition Rest API", () => {
   let isAzureServer: boolean;
 
   before((): Promise<void> => {
-    const useJsonStorage: boolean = !process.env.TEST_AZURE_STORAGE && !process.env.AZURE_ACQUISITION_URL;
-
     return Promise.resolve()
       .then(() => {
         if (process.env.AZURE_ACQUISITION_URL) {
           serverUrl = process.env.AZURE_ACQUISITION_URL;
           isAzureServer = true;
-          storageInstance = useJsonStorage ? new JsonStorage() : new AzureStorage();
+          storageInstance = new AzureStorage();
         } else {
           return new Promise<void>((resolve, reject) => {
             defaultServer.start(function (err: Error, app: express.Express, serverStorage: storage.Storage) {
@@ -48,7 +45,7 @@ describe("Acquisition Rest API", () => {
               server = app;
               storageInstance = serverStorage;
               resolve();
-            }, useJsonStorage);
+            });
           });
         }
       })
@@ -115,11 +112,6 @@ describe("Acquisition Rest API", () => {
 
   after((): Promise<void> => {
     return Promise.resolve()
-      .then(() => {
-        if (storageInstance instanceof JsonStorage) {
-          return storageInstance.dropAll();
-        }
-      })
       .then(() => {
         if (redisManager) {
           return redisManager.close();

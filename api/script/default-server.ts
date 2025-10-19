@@ -4,7 +4,6 @@
 import * as api from "./api";
 import { AzureStorage } from "./storage/azure-storage";
 import { fileUploadMiddleware } from "./file-upload-manager";
-import { JsonStorage } from "./storage/json-storage";
 import { RedisManager } from "./redis-manager";
 import { Storage } from "./storage/storage";
 import { Response } from "express";
@@ -46,16 +45,14 @@ function bodyParserErrorHandler(err: any, req: express.Request, res: express.Res
   }
 }
 
-export function start(done: (err?: any, server?: express.Express, storage?: Storage) => void, useJsonStorage?: boolean): void {
+export function start(done: (err?: any, server?: express.Express, storage?: Storage) => void): void {
   let storage: Storage;
   let isKeyVaultConfigured: boolean;
   let keyvaultClient: any;
 
   q<void>(null)
     .then(async () => {
-      if (useJsonStorage) {
-        storage = new JsonStorage();
-      } else if (!process.env.AZURE_KEYVAULT_ACCOUNT) {
+     if (!process.env.AZURE_KEYVAULT_ACCOUNT) {
         storage = new AzureStorage();
       } else {
         isKeyVaultConfigured = true;

@@ -5,17 +5,12 @@ import * as assert from "assert";
 import * as shortid from "shortid";
 
 import { AzureStorage } from "../script/storage/azure-storage";
-import { JsonStorage } from "../script/storage/json-storage";
 import * as storageTypes from "../script/storage/storage";
 import * as utils from "./utils";
 import { hashWithSHA256 } from "../script/utils/common";
 
 
-describe("JSON Storage", () => storageTests(JsonStorage));
-
-if (process.env.TEST_AZURE_STORAGE) {
-  describe("Azure Storage", () => storageTests(AzureStorage));
-}
+describe("Azure Storage", () => storageTests(AzureStorage));
 
 function storageTests(StorageType: new (...args: any[]) => storageTypes.Storage, disablePersistence?: boolean) {
   let storage: storageTypes.Storage;
@@ -26,27 +21,12 @@ function storageTests(StorageType: new (...args: any[]) => storageTypes.Storage,
     }
   });
 
-  beforeEach(() => {
-    if (StorageType === JsonStorage) {
-      storage = new StorageType(disablePersistence);
-    }
-  });
-
-  afterEach((): void => {
-    if (storage instanceof JsonStorage) {
-      storage.dropAll();
-    }
-  });
-
   describe("Storage management", () => {
     it("should be healthy if and only if running Azure storage", () => {
       return storage.checkHealth().then(
         /*returnedHealthy*/() => {
           assert.equal(StorageType, AzureStorage, "Should only return healthy if running Azure storage");
         },
-        /*returnedUnhealthy*/() => {
-          assert.equal(StorageType, JsonStorage, "Should only return unhealthy if running JSON storage");
-        }
       );
     });
 

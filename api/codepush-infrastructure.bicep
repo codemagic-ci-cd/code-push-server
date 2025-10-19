@@ -66,6 +66,8 @@ resource webApp 'Microsoft.Web/sites@2022-03-01' = {
         { name: 'SERVER_URL', value: serverUrl }
         { name: 'CORS_ORIGIN', value: serverUrl }
         { name: 'LOGGING', value: logging ? 'true' : 'false' }
+        { name: 'ENABLE_PACKAGE_DIFFING', value: 'true' }
+        { name: 'TMPDIR', value: '/tmp' }
       ]
     }
   }

@@ -66,6 +66,7 @@ export class PackageDiffer {
           newPackage.packageHash,
           newPackage.label
         );
+        
         const diffBlobInfoPromises: Promise<DiffBlobInfo>[] = [];
         if (packagesToDiff) {
           packagesToDiff.forEach((appPackage: storageTypes.Package) => {
@@ -165,10 +166,6 @@ export class PackageDiffer {
                   })
                   .on("end", (): void => {
                     readStreamCounter--;
-                    if (readStreamCounter === 0 && !readStreamError) {
-                      // All read streams have completed successfully
-                      // diffFile.end();
-                    }
                   });
 
                 diffFile.addReadStream(readStream, entry.fileName);
@@ -304,7 +301,7 @@ export class PackageDiffer {
     newPackageLabel: string
   ): storageTypes.Package[] {
     if (!history || !history.length) {
-      return null;
+      return [];
     }
 
     // We assume that the new package has been released and already is in history.
