@@ -58,7 +58,6 @@ To enable the Redis caching layer, set:
 
 To perform the unit tests against Azure storage:
 
-- `TEST_AZURE_STORAGE`: (For unit tests) Set to 'true' in order to run API unit tests against Azure storage (instead of mocked JSON storage). Note that outside of the test environment, we will always run against Azure storage regardless.
 - `AZURE_STORAGE_ACCOUNT`: (For unit tests) If TEST_AZURE_STORAGE is set to true, set to the account of the storage you would like to test on. If you are testing with Azurite, you can leave this value empty.
 - `AZURE_STORAGE_ACCESS_KEY`: (For unit tests) If TEST_AZURE_STORAGE is set to true, set to the access key of the storage you would like to test on. If you are testing with Azurite, you can leave this value empty.
 

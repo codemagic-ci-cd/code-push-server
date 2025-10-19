@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import { AzureStorage } from "../script/storage/azure-storage";
-import { JsonStorage } from "../script/storage/json-storage";
 import * as assert from "assert";
 import * as diffErrorUtils from "../script/utils/diff-error-handling";
 import * as express from "express";
@@ -21,11 +20,7 @@ import PackageDiffer = packageDiffing.PackageDiffer;
 import PackageManifest = hashUtils.PackageManifest;
 import Pend = require("pend");
 
-describe("Package diffing with JSON storage", () => packageDiffTests(JsonStorage));
-
-if (process.env.TEST_AZURE_STORAGE) {
-  describe("Package diffing with Azure Storage", () => packageDiffTests(AzureStorage));
-}
+describe("Package diffing with Azure Storage", () => packageDiffTests(AzureStorage));
 
 interface PackageInfo {
   packageHash: string;
@@ -71,7 +66,7 @@ function packageDiffTests(StorageType: new () => storage.Storage): void {
 
   describe("Package diffing utility (general)", () => {
     it("generates an incremental update package", function (done) {
-      this.timeout(5000);
+      this.timeout(10000);
 
       const oldManifest = new PackageManifest(
         new Map<string, string>()

@@ -15,22 +15,14 @@ import * as storage from "../script/storage/storage";
 import * as testUtils from "./utils";
 
 import { AzureStorage } from "../script/storage/azure-storage";
-import { JsonStorage } from "../script/storage/json-storage";
 
 import Permissions = storage.Permissions;
 
-if (!process.env.AZURE_MANAGEMENT_URL) {
-  // cannot use local JSON storage when running tests against an Azure server
-  describe("Management Rest API with JSON Storage", () => managementTests(/*useJsonStorage=*/ true));
-}
-
-if (process.env.TEST_AZURE_STORAGE) {
-  describe("Management Rest API with Azure Storage", () => managementTests());
-}
+describe("Management Rest API with Azure Storage", () => managementTests());
 
 const ACCESS_KEY_MASKING_STRING = "(hidden)";
 
-function managementTests(useJsonStorage?: boolean): void {
+function managementTests(): void {
   let server: express.Express;
   let serverUrl: string;
   let storage: storage.Storage;
@@ -53,7 +45,7 @@ function managementTests(useJsonStorage?: boolean): void {
       .then(() => {
         if (process.env.AZURE_MANAGEMENT_URL) {
           serverUrl = process.env.AZURE_MANAGEMENT_URL;
-          storage = useJsonStorage ? new JsonStorage() : new AzureStorage();
+          storage = new AzureStorage();
         } else {
           // use the middleware defined in DefaultServer
           const deferred: Promise<void> = new Promise<void>((resolve, reject) => {
@@ -63,7 +55,7 @@ function managementTests(useJsonStorage?: boolean): void {
               server = app;
               storage = serverStorage;
               resolve();
-            }, useJsonStorage);
+            });
           });
 
           return deferred;
@@ -100,11 +92,7 @@ function managementTests(useJsonStorage?: boolean): void {
   });
 
   after((): Promise<void> => {
-    return redisManager.close().then(() => {
-      if (storage instanceof JsonStorage) {
-        return storage.dropAll();
-      }
-    });
+    return redisManager.close();
   });
 
   describe("GET authenticated", () => {
@@ -1098,128 +1086,128 @@ function managementTests(useJsonStorage?: boolean): void {
         );
       });
 
-      if (!useJsonStorage) {
-        it("returns 201 if release of different package for same range", (done) => {
-          const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
-          const releasePackage: storage.Package = testUtils.makePackage("1.*");
-          POST(
-            url,
-            { packageInfo: releasePackage },
-            () => {
-              const releasePackage: storage.Package = testUtils.makePackage("2.*");
-              POST(
-                url,
-                { packageInfo: releasePackage },
-                () => {
-                  done();
-                },
-                differentPackage
-              );
-            },
-            identicalPackage
-          );
-        });
+    
+      it("returns 201 if release of different package for same range", (done) => {
+        const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
+        const releasePackage: storage.Package = testUtils.makePackage("1.*");
+        POST(
+          url,
+          { packageInfo: releasePackage },
+          () => {
+            const releasePackage: storage.Package = testUtils.makePackage("2.*");
+            POST(
+              url,
+              { packageInfo: releasePackage },
+              () => {
+                done();
+              },
+              differentPackage
+            );
+          },
+          identicalPackage
+        );
+      });
 
-        it("returns 201 if release of identical package for different range", (done) => {
-          const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
-          const releasePackage: storage.Package = testUtils.makePackage("1.*");
-          POST(
-            url,
-            { packageInfo: releasePackage },
-            () => {
-              const releasePackage: storage.Package = testUtils.makePackage("2.*");
-              POST(
-                url,
-                { packageInfo: releasePackage },
-                () => {
-                  done();
-                },
-                identicalPackage
-              );
-            },
-            identicalPackage
-          );
-        });
+      it("returns 201 if release of identical package for different range", (done) => {
+        const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
+        const releasePackage: storage.Package = testUtils.makePackage("1.*");
+        POST(
+          url,
+          { packageInfo: releasePackage },
+          () => {
+            const releasePackage: storage.Package = testUtils.makePackage("2.*");
+            POST(
+              url,
+              { packageInfo: releasePackage },
+              () => {
+                done();
+              },
+              identicalPackage
+            );
+          },
+          identicalPackage
+        );
+      });
 
-        it("returns 201 if release of identical package for app version range matching an previous release's app version", (done) => {
-          const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
-          const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
-          POST(
-            url,
-            { packageInfo: releasePackage },
-            () => {
-              const releasePackage: storage.Package = testUtils.makePackage("1.*");
-              POST(
-                url,
-                { packageInfo: releasePackage },
-                () => {
-                  done();
-                },
-                identicalPackage
-              );
-            },
-            identicalPackage
-          );
-        });
+      it("returns 201 if release of identical package for app version range matching an previous release's app version", (done) => {
+        const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
+        const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
+        POST(
+          url,
+          { packageInfo: releasePackage },
+          () => {
+            const releasePackage: storage.Package = testUtils.makePackage("1.*");
+            POST(
+              url,
+              { packageInfo: releasePackage },
+              () => {
+                done();
+              },
+              identicalPackage
+            );
+          },
+          identicalPackage
+        );
+      });
 
-        it("returns 201 if release of different package for app version in old version's range", (done) => {
-          const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
-          const releasePackage: storage.Package = testUtils.makePackage("1.*");
-          POST(
-            url,
-            { packageInfo: releasePackage },
-            () => {
-              const releasePackage: storage.Package = testUtils.makePackage("2.*");
-              POST(
-                url,
-                { packageInfo: releasePackage },
-                () => {
-                  const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
-                  POST(
-                    url,
-                    { packageInfo: releasePackage },
-                    () => {
-                      done();
-                    },
-                    differentPackage
-                  );
-                },
-                differentPackage
-              );
-            },
-            identicalPackage
-          );
-        });
+      it("returns 201 if release of different package for app version in old version's range", (done) => {
+        const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
+        const releasePackage: storage.Package = testUtils.makePackage("1.*");
+        POST(
+          url,
+          { packageInfo: releasePackage },
+          () => {
+            const releasePackage: storage.Package = testUtils.makePackage("2.*");
+            POST(
+              url,
+              { packageInfo: releasePackage },
+              () => {
+                const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
+                POST(
+                  url,
+                  { packageInfo: releasePackage },
+                  () => {
+                    done();
+                  },
+                  differentPackage
+                );
+              },
+              differentPackage
+            );
+          },
+          identicalPackage
+        );
+      });
 
-        it("returns 201 if release of different package of same app version in release history", (done) => {
-          const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
-          const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
-          POST(
-            url,
-            { packageInfo: releasePackage },
-            () => {
-              const releasePackage: storage.Package = testUtils.makePackage("2.0.0");
-              POST(
-                url,
-                { packageInfo: releasePackage },
-                () => {
-                  const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
-                  POST(
-                    url,
-                    { packageInfo: releasePackage },
-                    () => {
-                      done();
-                    },
-                    differentPackage
-                  );
-                },
-                differentPackage
-              );
-            },
-            identicalPackage
-          );
-        });
-      }
+      it("returns 201 if release of different package of same app version in release history", (done) => {
+        const url: string = "/apps/" + app.name + "/deployments/" + deployment.name + "/release";
+        const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
+        POST(
+          url,
+          { packageInfo: releasePackage },
+          () => {
+            const releasePackage: storage.Package = testUtils.makePackage("2.0.0");
+            POST(
+              url,
+              { packageInfo: releasePackage },
+              () => {
+                const releasePackage: storage.Package = testUtils.makePackage("1.2.0");
+                POST(
+                  url,
+                  { packageInfo: releasePackage },
+                  () => {
+                    done();
+                  },
+                  differentPackage
+                );
+              },
+              differentPackage
+            );
+          },
+          identicalPackage
+        );
+      });
+    
 
       it("returns 409 if the latest release contains a rollout", (done) => {
         const secondAppPackage: storage.Package = testUtils.makePackage();
@@ -1585,134 +1573,159 @@ function managementTests(useJsonStorage?: boolean): void {
       });
     });
 
-    if (!useJsonStorage) {
-      describe("PATCH release", () => {
-        let otherApp: storage.App;
-        let otherDeployment: storage.Deployment;
-        let v1Package: storage.Package;
-        let v2Package: storage.Package;
+    describe("PATCH release", () => {
+      let otherApp: storage.App;
+      let otherDeployment: storage.Deployment;
+      let v1Package: storage.Package;
+      let v2Package: storage.Package;
 
-        beforeEach(function (done) {
-          otherApp = testUtils.makeStorageApp();
-          otherDeployment = testUtils.makeStorageDeployment();
-          storage
-            .addApp(otherAccount.id, otherApp)
-            .then((addedApp: storage.App) => {
-              otherApp.id = addedApp.id;
-              return storage.addDeployment(otherAccount.id, otherApp.id, otherDeployment);
-            })
-            .then(() => {
-              return storage.addCollaborator(otherAccount.id, otherApp.id, account.email);
-            })
-            .then(() => {
-              const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-              v1Package = testUtils.makePackage();
-              v1Package.blobUrl = "/resources/blob.zip";
-              v1Package.description = packageDescription;
-              v1Package.isMandatory = true;
-              v1Package.manifestBlobUrl = null;
-              v1Package.packageHash = "hash100";
-              v1Package.appVersion = "1.0.0";
-              POST(
-                url,
-                { packageInfo: v1Package },
-                () => {
-                  const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-                  v2Package = testUtils.makePackage();
-                  v2Package.blobUrl = "/resources/test.zip";
-                  v2Package.description = packageDescription;
-                  v2Package.isMandatory = true;
-                  v2Package.manifestBlobUrl = null;
-                  v2Package.packageHash = "hash101";
-                  v2Package.appVersion = "1.0.0";
-                  v2Package.rollout = 25;
-                  otherDeployment.package = v2Package;
-                  POST(
-                    url,
-                    { packageInfo: v2Package },
-                    () => {
-                      done();
-                    },
-                    getTestResource("blob.zip")
-                  );
-                },
-                getTestResource("test.zip")
-              );
-            });
+      beforeEach(function (done) {
+        otherApp = testUtils.makeStorageApp();
+        otherDeployment = testUtils.makeStorageDeployment();
+        storage
+          .addApp(otherAccount.id, otherApp)
+          .then((addedApp: storage.App) => {
+            otherApp.id = addedApp.id;
+            return storage.addDeployment(otherAccount.id, otherApp.id, otherDeployment);
+          })
+          .then(() => {
+            return storage.addCollaborator(otherAccount.id, otherApp.id, account.email);
+          })
+          .then(() => {
+            const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+            v1Package = testUtils.makePackage();
+            v1Package.blobUrl = "/resources/blob.zip";
+            v1Package.description = packageDescription;
+            v1Package.isMandatory = true;
+            v1Package.manifestBlobUrl = null;
+            v1Package.packageHash = "hash100";
+            v1Package.appVersion = "1.0.0";
+            POST(
+              url,
+              { packageInfo: v1Package },
+              () => {
+                const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+                v2Package = testUtils.makePackage();
+                v2Package.blobUrl = "/resources/test.zip";
+                v2Package.description = packageDescription;
+                v2Package.isMandatory = true;
+                v2Package.manifestBlobUrl = null;
+                v2Package.packageHash = "hash101";
+                v2Package.appVersion = "1.0.0";
+                v2Package.rollout = 25;
+                otherDeployment.package = v2Package;
+                POST(
+                  url,
+                  { packageInfo: v2Package },
+                  () => {
+                    done();
+                  },
+                  getTestResource("blob.zip")
+                );
+              },
+              getTestResource("test.zip")
+            );
+          });
+      });
+
+      it("returns 400 for invalid parameters", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          rollout: 123,
+          description: "new description",
+        };
+
+        PATCH(url, { packageInfo: toPatch }, done, 400);
+      });
+
+      it("returns 404 for invalid app name", (done) => {
+        const url: string = "/apps/invalidAppName/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          rollout: 30,
+          description: "new description",
+        };
+
+        PATCH(url, { packageInfo: toPatch }, done, 404);
+      });
+
+      it("returns 404 for invalid deployment name", (done) => {
+        const url: string = "/apps/" + otherApp.name + "deployments/invalidDepName/release";
+        const toPatch: restTypes.PackageInfo = {
+          rollout: 30,
+          description: "new description",
+        };
+
+        PATCH(url, { packageInfo: toPatch }, done, 404);
+      });
+
+      it("returns 400 for non existent label", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          label: "nonExistentLabel",
+          rollout: 30,
+          description: "new description",
+        };
+
+        PATCH(url, { packageInfo: toPatch }, done, 400);
+      });
+
+      it("returns 409 for rollout value smaller than previous", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          rollout: 10,
+          description: "new description",
+        };
+
+        PATCH(url, { packageInfo: toPatch }, done, 409);
+      });
+
+      it("returns 409 for patching rollout to a completed release", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          label: "v1",
+          rollout: 50,
+          description: "new description",
+        };
+
+        PATCH(url, { packageInfo: toPatch }, done, 409);
+      });
+
+      it("can successfully patch the latest release", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          appVersion: "1.0.1",
+          description: "new description",
+          isDisabled: true,
+          isMandatory: false,
+          rollout: 40,
+        };
+
+        PATCH(url, { packageInfo: toPatch }, () => {
+          const historyUrl: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/history";
+          GET(historyUrl, (response: any) => {
+            const history: restTypes.Package[] = response.history;
+            assert.notEqual(history.length, 0);
+
+            const latest: restTypes.Package = history[history.length - 1];
+            assert.equal(latest.rollout, toPatch.rollout);
+            assert.equal(latest.description, toPatch.description);
+            assert.equal(latest.isDisabled, toPatch.isDisabled);
+            assert.equal(latest.isMandatory, toPatch.isMandatory);
+            assert.equal(latest.appVersion, toPatch.appVersion);
+            done();
+          });
         });
+      });
 
-        it("returns 400 for invalid parameters", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            rollout: 123,
-            description: "new description",
-          };
+      it("can re-enable a release", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          label: "v2",
+          isDisabled: true,
+        };
 
-          PATCH(url, { packageInfo: toPatch }, done, 400);
-        });
-
-        it("returns 404 for invalid app name", (done) => {
-          const url: string = "/apps/invalidAppName/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            rollout: 30,
-            description: "new description",
-          };
-
-          PATCH(url, { packageInfo: toPatch }, done, 404);
-        });
-
-        it("returns 404 for invalid deployment name", (done) => {
-          const url: string = "/apps/" + otherApp.name + "deployments/invalidDepName/release";
-          const toPatch: restTypes.PackageInfo = {
-            rollout: 30,
-            description: "new description",
-          };
-
-          PATCH(url, { packageInfo: toPatch }, done, 404);
-        });
-
-        it("returns 400 for non existent label", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            label: "nonExistentLabel",
-            rollout: 30,
-            description: "new description",
-          };
-
-          PATCH(url, { packageInfo: toPatch }, done, 400);
-        });
-
-        it("returns 409 for rollout value smaller than previous", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            rollout: 10,
-            description: "new description",
-          };
-
-          PATCH(url, { packageInfo: toPatch }, done, 409);
-        });
-
-        it("returns 409 for patching rollout to a completed release", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            label: "v1",
-            rollout: 50,
-            description: "new description",
-          };
-
-          PATCH(url, { packageInfo: toPatch }, done, 409);
-        });
-
-        it("can successfully patch the latest release", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            appVersion: "1.0.1",
-            description: "new description",
-            isDisabled: true,
-            isMandatory: false,
-            rollout: 40,
-          };
-
+        PATCH(url, { packageInfo: toPatch }, () => {
+          toPatch.isDisabled = false;
           PATCH(url, { packageInfo: toPatch }, () => {
             const historyUrl: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/history";
             GET(historyUrl, (response: any) => {
@@ -1720,84 +1733,58 @@ function managementTests(useJsonStorage?: boolean): void {
               assert.notEqual(history.length, 0);
 
               const latest: restTypes.Package = history[history.length - 1];
-              assert.equal(latest.rollout, toPatch.rollout);
-              assert.equal(latest.description, toPatch.description);
               assert.equal(latest.isDisabled, toPatch.isDisabled);
-              assert.equal(latest.isMandatory, toPatch.isMandatory);
-              assert.equal(latest.appVersion, toPatch.appVersion);
-              done();
-            });
-          });
-        });
-
-        it("can re-enable a release", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            label: "v2",
-            isDisabled: true,
-          };
-
-          PATCH(url, { packageInfo: toPatch }, () => {
-            toPatch.isDisabled = false;
-            PATCH(url, { packageInfo: toPatch }, () => {
-              const historyUrl: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/history";
-              GET(historyUrl, (response: any) => {
-                const history: restTypes.Package[] = response.history;
-                assert.notEqual(history.length, 0);
-
-                const latest: restTypes.Package = history[history.length - 1];
-                assert.equal(latest.isDisabled, toPatch.isDisabled);
-                done();
-              });
-            });
-          });
-        });
-
-        it("patching rollout to 100% nullifies the value on release", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            rollout: 100,
-          };
-
-          PATCH(url, { packageInfo: toPatch }, () => {
-            const historyUrl: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/history";
-            GET(historyUrl, (response: any) => {
-              const history: restTypes.Package[] = response.history;
-              assert.notEqual(history.length, 0);
-
-              const latest: restTypes.Package = history[history.length - 1];
-              assert.equal(latest.rollout, null);
-              done();
-            });
-          });
-        });
-
-        it("returns 204 for nothing to patch", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {};
-          PATCH(url, toPatch, done, 204);
-        });
-
-        it("can patch release to a different appVersion", (done) => {
-          const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
-          const toPatch: restTypes.PackageInfo = {
-            appVersion: "2.0.0",
-          };
-
-          PATCH(url, { packageInfo: toPatch }, () => {
-            const historyUrl: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/history";
-            GET(historyUrl, (response: any) => {
-              const history: restTypes.Package[] = response.history;
-              assert.notEqual(history.length, 0);
-
-              const latest: restTypes.Package = history[history.length - 1];
-              assert.equal(latest.appVersion, toPatch.appVersion);
               done();
             });
           });
         });
       });
-    }
+
+      it("patching rollout to 100% nullifies the value on release", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          rollout: 100,
+        };
+
+        PATCH(url, { packageInfo: toPatch }, () => {
+          const historyUrl: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/history";
+          GET(historyUrl, (response: any) => {
+            const history: restTypes.Package[] = response.history;
+            assert.notEqual(history.length, 0);
+
+            const latest: restTypes.Package = history[history.length - 1];
+            assert.equal(latest.rollout, null);
+            done();
+          });
+        });
+      });
+
+      it("returns 204 for nothing to patch", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {};
+        PATCH(url, toPatch, done, 204);
+      });
+
+      it("can patch release to a different appVersion", (done) => {
+        const url: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/release";
+        const toPatch: restTypes.PackageInfo = {
+          appVersion: "2.0.0",
+        };
+
+        PATCH(url, { packageInfo: toPatch }, () => {
+          const historyUrl: string = "/apps/" + otherApp.name + "/deployments/" + otherDeployment.name + "/history";
+          GET(historyUrl, (response: any) => {
+            const history: restTypes.Package[] = response.history;
+            assert.notEqual(history.length, 0);
+
+            const latest: restTypes.Package = history[history.length - 1];
+            assert.equal(latest.appVersion, toPatch.appVersion);
+            done();
+          });
+        });
+      });
+    });
+  
 
     describe("POST rollback", () => {
       it("returns 404 if nothing to rollback to", (done) => {
