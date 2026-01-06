@@ -85,7 +85,7 @@ function createResponseUsingStorage(
       // Currently, there's an infinite loop scenario in android when new code push release is roll out under 100%
       //
       // Android react-native-code-push sdk checks for appVersion to determine if it is proper update by comparing with the package appVersion with binary version
-      // If the code-push-server doesn't set the appVersion of the response package for rollout package, the android sdk considers the response as different app version target, and it keeps remove the packages internally, which lead to infinite installing loop.
+      // If the code-push-server doesn't set the appVersion of rollout package in the response, the android sdk considers the response as different app version target, and it keeps remove the packages internally, which lead to infinite installing loop in mandatory update scenario.
       // 
       // We are not sure about the impact of original package appVersion, so we patch only rollout package appVersion.
       if ((isMissingPatchVersion || isPlainIntegerNumber) && updateObject.rolloutPackage && updateObject.rolloutPackage.appVersion === updateRequest.appVersion) {
