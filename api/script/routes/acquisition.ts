@@ -83,7 +83,8 @@ function createResponseUsingStorage(
       // 1. To indicate the binary app version when there is an update available
       // 2. To indicate new binary app version when there is no update available 
       // Currently, there's an infinite loop scenario in android when new code push release is roll out under 100%
-      // Android react-native-code-push sdk checks for appVersion to determine if it should check for update by comparing with the package appVersion with binary version
+      //
+      // Android react-native-code-push sdk checks for appVersion to determine if it is proper update by comparing with the package appVersion with binary version
       // If the code-push-server doesn't set the appVersion of the response package for rollout package, the android sdk considers the response as different app version target, and it keeps remove the packages internally, which lead to infinite installing loop.
       // 
       // We are not sure about the impact of original package appVersion, so we patch only rollout package appVersion.
