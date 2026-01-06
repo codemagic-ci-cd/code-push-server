@@ -73,12 +73,9 @@ function createResponseUsingStorage(
   if (validationUtils.isValidUpdateCheckRequest(updateRequest)) {
     return storage.getPackageHistoryFromDeploymentKey(updateRequest.deploymentKey).then((packageHistory: storageTypes.Package[]) => {
       const updateObject: UpdateCheckCacheResponse = acquisitionUtils.getUpdatePackageInfo(packageHistory, updateRequest);
-      if ((isMissingPatchVersion || isPlainIntegerNumber) && updateObject.originalPackage.appVersion === updateRequest.appVersion) {
-        // Set the appVersion of the response to the original one with the missing patch version or plain number
-        updateObject.originalPackage.appVersion = originalAppVersion;
-        if (updateObject.rolloutPackage) {
-          updateObject.rolloutPackage.appVersion = originalAppVersion;
-        }
+      updateObject.originalPackage.appVersion = originalAppVersion;
+      if (updateObject.rolloutPackage) {
+        updateObject.rolloutPackage.appVersion = originalAppVersion;
       }
 
       const cacheableResponse: redis.CacheableResponse = {
