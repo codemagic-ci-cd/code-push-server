@@ -73,8 +73,12 @@ function createResponseUsingStorage(
   if (validationUtils.isValidUpdateCheckRequest(updateRequest)) {
     return storage.getPackageHistoryFromDeploymentKey(updateRequest.deploymentKey).then((packageHistory: storageTypes.Package[]) => {
       const updateObject: UpdateCheckCacheResponse = acquisitionUtils.getUpdatePackageInfo(packageHistory, updateRequest);
-      updateObject.originalPackage.appVersion = originalAppVersion;
-      if (updateObject.rolloutPackage) {
+      
+      // Set the appVersion of the response to the original one with the missing patch version or plain number
+      if ((isMissingPatchVersion || isPlainIntegerNumber) && updateObject.originalPackage.appVersion === updateRequest.appVersion) {
+        updateObject.originalPackage.appVersion = originalAppVersion;
+      }
+      if ((isMissingPatchVersion || isPlainIntegerNumber) && updateObject.rolloutPackage && updateObject.rolloutPackage.appVersion === updateRequest.appVersion) {
         updateObject.rolloutPackage.appVersion = originalAppVersion;
       }
 
