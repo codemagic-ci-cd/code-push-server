@@ -73,12 +73,23 @@ function createResponseUsingStorage(
   if (validationUtils.isValidUpdateCheckRequest(updateRequest)) {
     return storage.getPackageHistoryFromDeploymentKey(updateRequest.deploymentKey).then((packageHistory: storageTypes.Package[]) => {
       const updateObject: UpdateCheckCacheResponse = acquisitionUtils.getUpdatePackageInfo(packageHistory, updateRequest);
+      
+      // Set the appVersion of the response to the original one with the missing patch version or plain number
       if ((isMissingPatchVersion || isPlainIntegerNumber) && updateObject.originalPackage.appVersion === updateRequest.appVersion) {
-        // Set the appVersion of the response to the original one with the missing patch version or plain number
         updateObject.originalPackage.appVersion = originalAppVersion;
-        if (updateObject.rolloutPackage) {
-          updateObject.rolloutPackage.appVersion = originalAppVersion;
-        }
+      }
+
+      // appVersion of the response package has two purpose 
+      // 1. To indicate the binary app version when there is an update available
+      // 2. To indicate new binary app version when there is no update available 
+      // Currently, there's an infinite loop scenario in android when new code push release is roll out under 100%
+      //
+      // Android react-native-code-push sdk checks for appVersion to determine if it is proper update by comparing with the package appVersion with binary version
+      // If the code-push-server doesn't set the appVersion of rollout package in the response, the android sdk considers the response as different app version target, and it keeps remove the packages internally, which lead to infinite installing loop in mandatory update scenario.
+      // 
+      // We are not sure about the impact of original package appVersion, so we patch only rollout package appVersion.
+      if ((isMissingPatchVersion || isPlainIntegerNumber) && updateObject.rolloutPackage && updateObject.rolloutPackage.appVersion === updateRequest.appVersion) {
+        updateObject.rolloutPackage.appVersion = originalAppVersion;
       }
 
       const cacheableResponse: redis.CacheableResponse = {
