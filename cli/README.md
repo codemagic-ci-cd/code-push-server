@@ -115,7 +115,7 @@ code-push-standalone app add MyApp-iOS
 
 _NOTE: Using the same app for iOS and Android may cause installation exceptions because the CodePush update package produced for iOS will have different content from the update produced for Android._
 
-All new apps automatically come with two deployments (`Staging` and `Production`) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the `Staging` and `Production` deployments, which you can begin using to configure your mobile clients with the [React Native](http://github.com/Microsoft/react-native-code-push) SDK.
+All new apps automatically come with two deployments (`Staging` and `Production`) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the `Staging` and `Production` deployments, which you can begin using to configure your mobile clients with the [React Native](https://github.com/codemagic-ci-cd/react-native-code-push) SDK.
 
 If you decide that you don't like the name you gave to an app, you can rename it at any time using the following command:
 

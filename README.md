@@ -1,8 +1,8 @@
-# Visual Studio App Center CodePush Standalone Version
+# CodePush Server
 
-[CodePush](https://learn.microsoft.com/en-us/appcenter/distribution/codepush/) is an App Center feature that enables React Native developers to deploy mobile app updates directly to their users’ devices. It consists of two parts: CodePush Server where developers can publish app updates to (e.g. JS, HTML, CSS or image changes), and [CodePush React Native Client SDK](https://github.com/Microsoft/react-native-code-push) that enables querying for updates from within an app.
+CodePush Server is an over-the-air update service for React Native applications. Developers can use it to publish app updates such as JavaScript, HTML, CSS, and image changes to a self-hosted server, while mobile apps use the [CodePush React Native Client SDK](https://github.com/codemagic-ci-cd/react-native-code-push) to query and install updates.
 
-We announced that Visual Studio App Center will be retired on March 31, 2025. You can learn more about the support timeline and alternatives on https://aka.ms/appcenter/retire. In order to let developers keep using CodePush functionality after App Center is fully retired, we created a standalone version of CodePush Server that can be deployed and used independently from App Center itself. Code of this standalone version can be found in this repository. It is fully compatible with [CodePush React Native Client SDK](https://github.com/Microsoft/react-native-code-push).
+CodePush was originally created by Microsoft and open-sourced under the MIT License. This server is now maintained by Codemagic at [codemagic-ci-cd/code-push-server](https://github.com/codemagic-ci-cd/code-push-server), alongside the compatible [codemagic-ci-cd/react-native-code-push](https://github.com/codemagic-ci-cd/react-native-code-push) SDK.
 
 
 ## Getting Started
@@ -20,18 +20,9 @@ The CodePush CLI, located in `cli` subdirectory, is a command-line tool that all
 
 ## Contributing
 
-While we cannot accept contributions or issues in this repository; however, as a permissively licensed open-source project, it is ready for community development and forks independently.
+Contributions are welcome. Please use [GitHub Issues](https://github.com/codemagic-ci-cd/code-push-server/issues) to report bugs, request features, or discuss changes before opening larger pull requests.
 
 
 ## Support
 
-This code is provided “as is”, because of that Microsoft will not provide support services for it.
-
-
-## Legal Notice
-
-Microsoft grants you access to the code in this repository under the MIT License, see the [LICENSE](./LICENSE) to learn more.
-
-Microsoft, Windows, Microsoft Azure and/or other Microsoft products and services referenced in the documentation may be either trademarks or registered trademarks of Microsoft in the United States and/or other countries. The license for this code does not grant you rights to use any Microsoft names, logos, or trademarks. Go to [Microsoft Trademark and Brand Guidelines](http://go.microsoft.com/fwlink/?LinkID=254653) for more information.
-
-Privacy information can be found at https://privacy.microsoft.com/.
+For support, usage questions, and community discussion, please open a [GitHub Issue](https://github.com/codemagic-ci-cd/code-push-server/issues).
