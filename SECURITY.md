@@ -1,41 +1,44 @@
-<!-- BEGIN MICROSOFT SECURITY.MD V0.0.9 BLOCK -->
+# Security Policy
 
-## Security
+## Reporting a Vulnerability
 
-Microsoft takes the security of our software products and services seriously, which includes all source code repositories managed through our GitHub organizations, which include [Microsoft](https://github.com/Microsoft), [Azure](https://github.com/Azure), [DotNet](https://github.com/dotnet), [AspNet](https://github.com/aspnet) and [Xamarin](https://github.com/xamarin).
+Please do not report security vulnerabilities through public GitHub issues.
 
-If you believe you have found a security vulnerability in any Microsoft-owned repository that meets [Microsoft's definition of a security vulnerability](https://aka.ms/security.md/definition), please report it to us as described below.
+Use GitHub Private Vulnerability Reporting for this repository:
 
-## Reporting Security Issues
+1. Open the repository on GitHub.
+1. Go to the **Security** tab.
+1. Select **Report a vulnerability**.
+1. Include as much detail as possible so maintainers can reproduce and assess the issue.
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+## What to Report
 
-Instead, please report them to the Microsoft Security Response Center (MSRC) at [https://msrc.microsoft.com/create-report](https://aka.ms/security.md/msrc/create-report).
+Please report vulnerabilities that could affect the confidentiality, integrity, or availability of CodePush Server, the CodePush CLI, or update delivery. Useful reports include:
 
-If you prefer to submit without logging in, send email to [secure@microsoft.com](mailto:secure@microsoft.com).  If possible, encrypt your message with our PGP key; please download it from the [Microsoft Security Response Center PGP Key page](https://aka.ms/security.md/msrc/pgp).
+- Authentication or authorization bypasses
+- Privilege escalation between accounts, apps, deployments, or collaborators
+- Update package tampering, signature bypasses, or unsafe release delivery behavior
+- Exposure of deployment keys, access keys, secrets, tokens, or private update artifacts
+- Injection vulnerabilities, cross-site scripting, server-side request forgery, or unsafe deserialization
+- Storage access issues that expose or allow modification of another user's data
+- Dependency vulnerabilities with a realistic exploit path in this project
 
-You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Additional information can be found at [microsoft.com/msrc](https://www.microsoft.com/msrc). 
+Please include:
 
-Please include the requested information listed below (as much as you can provide) to help us better understand the nature and scope of the possible issue:
+- Affected version, commit, branch, or deployment configuration
+- Steps to reproduce the issue
+- Proof-of-concept code or requests, when safe to share
+- Expected and actual behavior
+- Impact and any known mitigations
 
-  * Type of issue (e.g. buffer overflow, SQL injection, cross-site scripting, etc.)
-  * Full paths of source file(s) related to the manifestation of the issue
-  * The location of the affected source code (tag/branch/commit or direct URL)
-  * Any special configuration required to reproduce the issue
-  * Step-by-step instructions to reproduce the issue
-  * Proof-of-concept or exploit code (if possible)
-  * Impact of the issue, including how an attacker might exploit the issue
+## Response Expectations
 
-This information will help us triage your report more quickly.
+Maintainers aim to acknowledge new vulnerability reports within 5 business days. After initial triage, maintainers will work with the reporter to confirm impact, identify affected versions, prepare fixes, and coordinate disclosure timing.
 
-If you are reporting for a bug bounty, more complete reports can contribute to a higher bounty award. Please visit our [Microsoft Bug Bounty Program](https://aka.ms/security.md/msrc/bounty) page for more details about our active programs.
+Response times may vary based on report complexity and maintainer availability, but maintainers will make a good-faith effort to keep reporters updated while an issue is being investigated.
 
-## Preferred Languages
+## Coordinated Disclosure
 
-We prefer all communications to be in English.
+Please keep vulnerability details private until maintainers have investigated the report and, when needed, prepared a fix or mitigation. After a fix is available, maintainers will coordinate public disclosure through GitHub security advisories, release notes, or other appropriate project channels.
 
-## Policy
-
-Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https://aka.ms/security.md/cvd).
-
-<!-- END MICROSOFT SECURITY.MD BLOCK -->
+Reports should be made in good faith and should avoid privacy violations, data destruction, service disruption, or access to data beyond what is necessary to demonstrate the vulnerability.

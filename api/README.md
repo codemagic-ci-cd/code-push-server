@@ -2,7 +2,7 @@
 
 The CodePush Server is a Node.js application that powers the CodePush Service. It allows users to deploy and manage over-the-air updates for their react-native applications in a self-hosted environment.
 
-Please refer to [react-native-code-push](https://github.com/microsoft/react-native-code-push) for instructions on how to onboard your application to CodePush.
+Please refer to [react-native-code-push](https://github.com/codemagic-ci-cd/react-native-code-push) for instructions on how to onboard your application to CodePush.
 
 ## Deployment
 
@@ -103,7 +103,7 @@ More detailed instructions on how to set up one can be found in the section [OAu
 
 ## Configure react-native-code-push
 
-In order for [react-native-code-push](https://github.com/microsoft/react-native-code-push) to use your server, additional configuration value is needed.
+In order for [react-native-code-push](https://github.com/codemagic-ci-cd/react-native-code-push) to use your server, additional configuration value is needed.
 
 ### Android
 
